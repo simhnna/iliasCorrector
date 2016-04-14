@@ -27,4 +27,4 @@ app.config.from_envvar('CORRECTOR_SETTINGS', silent=True)
 app.error_handler_spec[None][404] = err404
 db = SQLAlchemy(app)
 
-from corrector import views, models
+from iliasCorrector import views, models

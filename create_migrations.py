@@ -1,7 +1,7 @@
 #!flask/bin/python
 import imp
 from migrate.versioning import api
-from corrector import db, app
+from iliasCorrector import db, app
 database = app.config['SQLALCHEMY_DATABASE_URI']
 migrations = app.config['SQLALCHEMY_MIGRATE_REPO']
 v = api.db_version(database, migrations)

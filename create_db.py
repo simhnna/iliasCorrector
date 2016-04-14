@@ -1,6 +1,6 @@
 #!flask/bin/python
 from migrate.versioning import api
-from corrector import db, app
+from iliasCorrector import db, app
 import os.path
 
 migrations = app.config['SQLALCHEMY_MIGRATE_REPO']

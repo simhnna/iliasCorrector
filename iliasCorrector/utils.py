@@ -1,5 +1,5 @@
-from corrector import app, db
-from corrector.models import Student, Exercise, Submission, File
+from iliasCorrector import app, db
+from iliasCorrector.models import Student, Exercise, Submission, File
 from flask import g
 
 import os

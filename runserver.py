@@ -1,3 +1,3 @@
-from corrector import app
+from iliasCorrector import app
 
 app.run(debug=True)

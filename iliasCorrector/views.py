@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, make_response
-from corrector import app, db
-from corrector.models import Exercise, Submission, File
-from corrector import utils
+from iliasCorrector import app, db
+from iliasCorrector.models import Exercise, Submission, File
+from iliasCorrector import utils
 from werkzeug import secure_filename
 import os
 

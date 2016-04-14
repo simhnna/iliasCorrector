@@ -1,4 +1,4 @@
-from corrector import db
+from iliasCorrector import db
 
 
 class Exercise(db.Model):
