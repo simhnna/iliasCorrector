@@ -2,4 +2,4 @@ __pycache__
 *.pyc
 data
 env
-corrector/app.db
+iliasCorrector/app.db
