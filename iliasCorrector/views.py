@@ -34,7 +34,7 @@ def submission(exercise_id=None, submission_id=None):
         submission.remarks = remarks.replace(';', '-')
         db.session.add(submission)
         db.session.commit()
-        next_submission = submission.exercise.submissions.filter_by(grade=None).first()
+        next_submission = submission.exercise.submissions.filter_by(grade=None).join(Student).order_by('student.ident').first()
         if not next_submission:
             flash('Finished correcting submissions for exercise {}'.format(submission.exercise), 'success')
             return redirect(url_for('exercise', exercise_id=exercise_id))
