@@ -27,7 +27,6 @@
     <div class="determinate" style="width: {{ exercise.num_corrected / (exercise.num_corrected + exercise.num_to_correct) * 100 }}%"></div>
   </div>
   <div class="right-align">
-    <a href="#import-modal" class="btn waves-effect waves-light modal-trigger">Import Grades</a>
     <a href="{{ url_for('export_grades', exercise_id=exercise.id) }}" class="btn waves-effect waves-light">Export Grades</a>
     {% if exercise.num_to_correct != 0 %}
     <a href="{{ url_for('submission', exercise_id=exercise.id) }}" class="waves-effect waves-light btn">Grade next Student</a>
@@ -41,6 +40,7 @@
         <th>#</th>
         <th>Last Name</th>
         <th>First Name</th>
+        <th>Submitted Files</th>
         <th>Grade</th>
         <th></th>
       </tr>
@@ -50,51 +50,17 @@
       <td>{{ loop.index }}</td>
       <td>{{ submission.student.last_name }}</td>
       <td>{{ submission.student.first_name }}</td>
+      <td>
+        {% if submission.files.all()|length > 0 %}
+        <i class="material-icons">done</i>
+        {% else %}
+        <i class="material-icons">close</i>
+        {% endif %}
+      </td>
       <td>{{ submission.grade }}</td>
       <td><a href="{{ url_for('submission', exercise_id=exercise.id, submission_id=submission.id)}}" class="btn">Grade</a></td>
     </tr>
     {% endfor %}
   </table>
 </div>
-{% endblock %}
-
-{% block modal %}
-<div class="modal" id="import-modal">
-    <div class="modal-content">
-      <form enctype="multipart/form-data" method="post" class="form-inline" action="{{ url_for('import_grades', exercise_id=exercise.id) }}">
-        <div class="modal-header">
-          <h4 class="modal-title">Import grades</h4>
-        </div>
-        <div class="modal-body">
-          <p>
-          Select the points.csv that you wish to import.
-          <br>
-          This will overwrite grades and remarkes
-          <br>
-          (You should use this only if points.csv contains information that you need to import)
-          </p>
-          <div class="file-field input-field">
-            <div class="btn">
-              <span>File</span>
-              <input type="file">
-            </div>
-            <div class="file-path-wrapper">
-              <input type="text" readonly="" class="file-path" >
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="modal-action modal-close waves-effect btn-flat">Close</button>
-          <button type="submit" class="modal-action waves-effect btn-flat">Import</button>
-        </div>
-      </form>
-  </div>
-</div>
-{% endblock %}
-{% block js %}
-<script>
-  $(document).ready(function(){
-    $('.modal-trigger').leanModal();
-  });
-</script>
 {% endblock %}

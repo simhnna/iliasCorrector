@@ -40,7 +40,7 @@ class Student(db.Model):
 
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    grade = db.Column(db.Integer)
+    grade = db.Column(db.Float)
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
     files = db.relationship('File', backref='submission', lazy='dynamic')

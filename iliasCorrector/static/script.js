@@ -6,7 +6,3 @@ $('#sync-exercises').click(function() {
     setTimeout(function() {location.reload();}, 2000)
   });
 });
-
-$('#import-grades').click(function() {
-  $('.overlay').removeClass('hide');
-});

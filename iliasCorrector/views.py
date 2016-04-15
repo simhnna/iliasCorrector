@@ -52,17 +52,6 @@ def update_exercises():
     utils.update_exercises()
     return "done"
 
-
-@app.route('/exercise/<exercise_id>/import/', methods=['POST'])
-def import_grades(exercise_id):
-    exercise = Exercise.query.get_or_404(exercise_id)
-    f = request.files.get('inputFile', None)
-    if f:
-        lines = f.readlines()
-        utils.import_grades(exercise, [ str(l).strip() for l in lines])
-    return redirect(url_for('exercise', exercise_id=exercise_id))
-
-
 @app.route('/exercise/<exercise_id>/export/')
 def export_grades(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)

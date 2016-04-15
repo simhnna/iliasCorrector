@@ -42,7 +42,7 @@
       <form method="post" action="">
         <div class="input-field">
           <label for="grade">Grade</label>
-          <input id="grade" type="number" name="grade" value="{{ submission.grade or '' }}" required>
+          <input id="grade" type="number" name="grade" value="{{ submission.grade or '' }}" required step="0.1" min="0">
         </div>
         <div class="input-field">
           <label for="remarks">Remarks</label>

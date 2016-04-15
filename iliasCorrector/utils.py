@@ -5,35 +5,39 @@ from flask import g
 import os
 
 
-def import_grades(exercise, lines):
-    for line in lines:
-        data = line.split(';')
-        matr = int(data[0].split('_')[-1])
-        grade = data[1]
-        remarks = data[2]
-        if grade == '---':
-            grade = None
-        if remarks == '-- keine Bemerkung --':
-            remarks = None
+def import_grades(exercise, points):
+    with open(points) as f:
+        for line in f:
+            data = line.split(';')
+            matr = int(data[0].split('_')[-1])
+            grade = data[1]
+            remarks = data[2]
+            if grade == '---':
+                grade = None
+            if remarks.strip() == '-- keine Bemerkung --':
+                remarks = None
 
-        submission = exercise.submissions.join(Student).filter(Student.matriculation_nr == matr).first()
-        if not submission:
-            student = Student.query.filter_by(matriculation_nr=matr).first()
-            if not student:
-                last, first, user, _ = data[0].split('_')
-                student = Student(first_name=first, last_name=last, ident=data[0], matriculation_nr = matr)
-                db.session.add(student)
+            submission = exercise.submissions.join(Student).filter(Student.matriculation_nr == matr).first()
+            if not submission:
+                student = Student.query.filter_by(matriculation_nr=matr).first()
+                if not student:
+                    student_data = data[0].split('_')
+                    last = student_data[0]
+                    first = ' '.join(student_data[1:-2])
+                    student = Student(first_name=first, last_name=last, ident=data[0], matriculation_nr = matr)
+                    db.session.add(student)
+                    db.session.commit()
+                submission = Submission(exercise_id=exercise.id,
+                        student_id=student.id, grade=0, remarks='-- keine Abgabe --')
+                db.session.add(submission)
                 db.session.commit()
-            submission = Submission(exercise_id=exercise.id, student_id=student.id, grade=0, remarks='-- keine Abgabe --')
-            db.session.add(submission)
-            db.session.commit()
-            continue
+                continue
 
-        if grade or remarks:
-            submission.remarks = remarks or submission.remarks
-            submission.grade = float(grade or '0') or submission.grade
-            db.session.add(submission)
-            db.session.commit()
+            if grade or remarks:
+                submission.remarks = remarks or submission.remarks
+                submission.grade = float(grade or '0') or submission.grade
+                db.session.add(submission)
+                db.session.commit()
 
 
 def export_grades(exercise):
@@ -74,7 +78,9 @@ def update_exercises():
         db.session.add(exercise)
         db.session.commit()
         for i in range(len(students)):
-            last, first, user, matr = students[i]
+            if len(students[i]) != 4: 
+                continue
+            last, first, _, matr = students[i]
             student = Student.query.filter_by(matriculation_nr=int(matr)).first()
             if not student:
                 student = Student(first_name=first, last_name=last, matriculation_nr=int(matr), ident='_'.join(students[i]))
@@ -87,3 +93,6 @@ def update_exercises():
                 stored_file = File(submission=submission, name=f, path=root[i + 1])
                 db.session.add(stored_file)
                 db.session.commit()
+
+        # import grades
+        import_grades(exercise, os.path.join(path, 'points.csv'))

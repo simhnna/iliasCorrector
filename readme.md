@@ -31,7 +31,8 @@ python app.py runserver
 * Go to http://localhost:5000/
 * Press `Synchronize Exercises` to read `iliasCorrector/data` and create entries for the submissions in the database.  
 Note that each exercise (subdirectory) can only be imported one time. Currently exercises can not be updated. So make sure the directory contains all the necessary files.
-* You can import grades from a csv file of the following format:
+* Grades are imported from a csv file of the following format that resides in
+  the assignments' directory:
 ```
 <Last Name>_<First Name>_<First Name><Last Name>_<Matriculation Number>;<Grade>|<Remarks>
 ```
