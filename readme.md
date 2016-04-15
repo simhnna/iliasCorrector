@@ -14,19 +14,10 @@ source env/bin/activate
 pip install -r requirements.txt
 
 # create database
-python create_db.py
+python app.py db upgrade
 
 # run the web interface
-python runserver.py
-
-# create migrations (only needed if you change the models)
-python create_migrations.py
-
-# update database to the latest migration
-python update_db.py
-
-# downgrade database one migration
-python downgrade_db.py
+python app.py runserver
 ```
 
 
