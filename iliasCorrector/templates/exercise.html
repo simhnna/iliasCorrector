@@ -45,7 +45,7 @@
         <th></th>
       </tr>
     </thead>
-    {% for submission in exercise.submissions %}
+    {% for submission in submissions %}
     <tr>
       <td>{{ loop.index }}</td>
       <td>{{ submission.student.last_name }}</td>

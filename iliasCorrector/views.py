@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, send_from_directory, make_response
 from iliasCorrector import app, db
-from iliasCorrector.models import Exercise, Submission, File
+from iliasCorrector.models import Exercise, Submission, File, Student
 from iliasCorrector import utils
 from werkzeug import secure_filename
 import os
@@ -15,14 +15,15 @@ def index():
 @app.route('/exercise/<exercise_id>/')
 def exercise(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    return render_template('exercise.html', exercise=exercise)
+    submissions = exercise.submissions.join(Student).order_by('student.ident')
+    return render_template('exercise.html', exercise=exercise, submissions=submissions)
 
 
 @app.route('/exercise/<exercise_id>/submission/')
 @app.route('/exercise/<exercise_id>/submission/<submission_id>/', methods=['GET', 'POST'])
 def submission(exercise_id=None, submission_id=None):
     if not submission_id:
-        submission = Submission.query.filter_by(exercise_id=exercise_id, grade=None).first()
+        submission = Submission.query.filter_by(exercise_id=exercise_id, grade=None).join(Student).order_by('student.ident').first()
         return redirect(url_for('submission', exercise_id=exercise_id, submission_id=submission.id))
     submission = Submission.query.get_or_404(submission_id)
     if request.method == 'POST':

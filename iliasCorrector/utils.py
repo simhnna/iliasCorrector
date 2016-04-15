@@ -42,7 +42,7 @@ def import_grades(exercise, points):
 
 def export_grades(exercise):
     lines = []
-    for submission in exercise.submissions.all():
+    for submission in exercise.submissions.join(Student).order_by('student.ident').all():
         grade = submission.grade
         if grade:
             grade = str(grade)
