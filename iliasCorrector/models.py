@@ -32,10 +32,10 @@ class Student(db.Model):
     submissions = db.relationship('Submission', backref='student', lazy='dynamic')
 
     def __repr__(self):
-        return '<Student {}, {}>'.format(self.first_name, self.last_name)
+        return '<Student {}, {}>'.format(self.last_name, self.first_name)
 
     def __str__(self):
-        return '{}, {}'.format(self.first_name, self.last_name)
+        return '{}, {}'.format(self.last_name, self.first_name)
 
 
 class Submission(db.Model):
