@@ -51,6 +51,7 @@ def export_grades(exercise):
         remarks = submission.remarks
         if remarks:
             remarks = remarks.strip()
+            remarks.replace('\n', '  ')
         else:
             remarks = '-- keine Bemerkung --'
         lines.append(';'.join([submission.student.ident, grade, remarks]))

@@ -39,7 +39,7 @@ def submission(exercise_id=None, submission_id=None):
         remarks = request.form.get('remarks', None)
         flash('Successfully graded {} with {} points'.format(submission.student, grade), 'success')
         submission.grade = grade
-        submission.remarks = remarks.replace(';', '-')
+        submission.remarks = remarks.replace(';', '-').replace('\r', '')
         db.session.add(submission)
         db.session.commit()
         if not next_submission:
