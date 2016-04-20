@@ -70,7 +70,7 @@ def update_exercises():
 
         exercise_path = root[0]
         exercise_name = root[0].split('/')[-1]
-        students = [x.split('_') for x in dirs]
+        students = [x for x in dirs]
 
         if len(students) < 1:
             continue
@@ -79,12 +79,14 @@ def update_exercises():
         db.session.add(exercise)
         db.session.commit()
         for i in range(len(students)):
-            if len(students[i]) != 4: 
-                continue
-            last, first, _, matr = students[i]
+            student_data = students[i].split('_')
+            matr = int(students[i].split('_')[-1])
+            last = student_data[0]
+            first = ' '.join(student_data[1:-2])
+
             student = Student.query.filter_by(matriculation_nr=int(matr)).first()
             if not student:
-                student = Student(first_name=first, last_name=last, matriculation_nr=int(matr), ident='_'.join(students[i]))
+                student = Student(first_name=first, last_name=last, matriculation_nr=int(matr), ident=students[i])
                 db.session.add(student)
                 db.session.commit()
             submission = Submission(student=student, exercise=exercise)
