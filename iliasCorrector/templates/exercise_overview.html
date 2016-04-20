@@ -8,7 +8,7 @@
       <div class="row">
         <div class="col s11 offset-s1">
           <a href="{{ url_for('index') }}" class="breadcrumb">Exercises</a>
-          <a href="#!" class="breadcrumb">{{ exercise.name }}</a>
+          <a href="{{ url_for('exercise', exercise_id=exercise.id) }}" class="breadcrumb">{{ exercise.name }}</a>
         </div>
       </div>
     </div>
@@ -27,42 +27,49 @@
     <div class="determinate" style="width: {{ exercise.num_corrected / (exercise.num_corrected + exercise.num_to_correct) * 100 }}%"></div>
   </div>
   <div class="right-align">
-    <a href="{{ url_for('exercise_overview', exercise_id=exercise.id) }}"
-      class="btn waves-effect waves-light">Submission Overview</a>
+    {% if exercise.num_to_correct == 0 %}
     <a href="{{ url_for('export_grades', exercise_id=exercise.id) }}" class="btn waves-effect waves-light">Export Grades</a>
-    {% if exercise.num_to_correct != 0 %}
+    {% else %}
     <a href="{{ url_for('submission', exercise_id=exercise.id) }}" class="waves-effect waves-light btn">Grade next Student</a>
     {% endif %}
   </div>
 </div>
 <div class="section">
-  <table class="bordered striped">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Submitted Files</th>
-        <th>Grade</th>
-        <th></th>
-      </tr>
-    </thead>
+  <h4>Submissions</h4>
+  <div class="row">
+    <div class="col s2">Name</div>
+    <div class="col s1">Submitted</div>
+    <div class="col s2">Grade</div>
+    <div class="col s7">Remarks</div>
+  </div>
+  <div class="collection">
     {% for submission in submissions %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ submission.student.last_name }}</td>
-      <td>{{ submission.student.first_name }}</td>
-      <td>
-        {% if submission.files.all()|length > 0 %}
-        <i class="material-icons">done</i>
+    <div class="collection-item">
+      <div class="row">
+        <div class="col s2">{{ submission.student }}</div>
+        <div class="col s1">
+          {% if submission.files.all()|length > 0 %}
+          <i class="material-icons">done</i>
+          {% else %}
+          <i class="material-icons">close</i>
+          {% endif %}
+        </div>
+        <div class="col s1">
+          {{ submission.grade }}
+        </div>
+        {% if submission.remarks %}
+        <div class="col s5">
+          {{ submission.remarks }}
+        </div>
+        <div class="col s2 right-align">
         {% else %}
-        <i class="material-icons">close</i>
+        <div class="col s7 right-align">
         {% endif %}
-      </td>
-      <td>{{ submission.grade }}</td>
-      <td><a href="{{ url_for('submission', exercise_id=exercise.id, submission_id=submission.id)}}" class="btn">Grade</a></td>
-    </tr>
+          <a href="{{ url_for('submission', exercise_id=exercise.id, submission_id=submission.id)}}" class="secondary-content btn">Grade</a>
+        </div>
+      </div>
+    </div>
     {% endfor %}
-  </table>
+  </div>
 </div>
 {% endblock %}
