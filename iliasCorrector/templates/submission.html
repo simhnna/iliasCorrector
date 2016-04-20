@@ -49,7 +49,7 @@
       <form method="post" action="">
         <div class="input-field">
           <label for="grade">Grade</label>
-          <input autofocus id="grade" type="number" name="grade" value="{{ submission.grade or '' }}" required step="0.1" min="0">
+          <input id="grade" type="number" name="grade" value="{{ submission.grade }}" required step="0.1" min="0">
         </div>
         <div class="input-field">
           <label for="remarks">Remarks</label>
