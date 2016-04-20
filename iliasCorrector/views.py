@@ -37,10 +37,10 @@ def submission(exercise_id=None, submission_id=None):
                                           submission.student.ident)
     if request.method == 'POST':
         grade = request.form.get('grade', None)
-        remarks = request.form.get('remarks', None)
+        remarks = request.form.get('remarks', '')
         flash('Successfully graded {} with {} points'.format(submission.student, grade), 'success')
         submission.grade = grade
-        submission.remarks = remarks.replace(';', '-').replace('\r', '')
+        submission.remarks = remarks.strip().replace(';', '-').replace('\r\n', ' -- ')
         db.session.add(submission)
         db.session.commit()
         if not next_submission:
