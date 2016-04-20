@@ -3,6 +3,7 @@ from iliasCorrector import app, db
 from iliasCorrector.models import Exercise, Submission, File, Student
 from iliasCorrector import utils
 from werkzeug import secure_filename
+from sqlalchemy import func
 import os
 
 
@@ -15,14 +16,14 @@ def index():
 @app.route('/exercise/<exercise_id>/')
 def exercise(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    submissions = exercise.submissions.join(Student).order_by('student.ident')
+    submissions = exercise.submissions.join(Student).order_by(func.lower(Student.ident))
     return render_template('exercise.html', exercise=exercise, submissions=submissions)
 
 
 def get_next_submission(exercise_id, ident=''):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
     return exercise.submissions.filter_by(grade=None).join(Student).order_by(
-            'student.ident').filter(Student.ident > ident).first()
+            func.lower(Student.ident)).filter(Student.ident > ident).first()
 
 
 @app.route('/exercise/<exercise_id>/submission/')

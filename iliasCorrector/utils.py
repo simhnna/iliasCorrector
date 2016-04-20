@@ -1,6 +1,7 @@
 from iliasCorrector import app, db
 from iliasCorrector.models import Student, Exercise, Submission, File
 from flask import g
+from sqlalchemy import func
 
 import os
 
@@ -42,7 +43,7 @@ def import_grades(exercise, points):
 
 def export_grades(exercise):
     lines = []
-    for submission in exercise.submissions.join(Student).order_by('student.ident').all():
+    for submission in exercise.submissions.join(Student).order_by(func.lower(Student.ident)).all():
         grade = submission.grade
         if grade:
             grade = str(grade)
