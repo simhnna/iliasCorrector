@@ -4,6 +4,7 @@ from flask import g
 from sqlalchemy import func
 
 import os
+import statistics
 
 
 def import_grades(exercise, points):
@@ -100,3 +101,39 @@ def update_exercises():
 
         # import grades
         import_grades(exercise, os.path.join(path, 'points.csv'))
+
+
+def get_exercises():
+    return next(os.walk(os.path.join(app.config['BASE_DIR'], 'groups')))[1]
+
+
+def get_groups(exercise):
+    return next(os.walk(os.path.join(app.config['BASE_DIR'], 'groups', exercise)))[2]
+
+
+def get_students(exercise, group):
+    students = []
+    with open(os.path.join(app.config['BASE_DIR'], 'groups', exercise, group)) as f:
+        for line in f:
+            data = line.strip().split(';')
+            for i in range(len(data)):
+                if not data[i]:
+                    data[i] = 0
+            students.append(data)
+    return students
+
+
+def submission_median(submissions):
+    grades = list(filter((None).__ne__, [s.grade for s in submissions]))
+    return statistics.median(grades)
+
+def submission_mean(submissions):
+    grades = list(filter((None).__ne__, [s.grade for s in submissions]))
+    return statistics.mean(grades)
+
+def split_ident(ident):
+    data = ident.split('_')
+    matr = int(data[-1])
+    last = data[0]
+    first = ' '.join(data[1:-2])
+    return first, last, matr

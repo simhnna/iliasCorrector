@@ -1,4 +1,5 @@
-from flask import render_template, flash, redirect, url_for, request, send_from_directory, make_response
+from flask import (render_template, flash, redirect, url_for, request,
+                   send_from_directory, make_response)
 from iliasCorrector import app, db
 from iliasCorrector.models import Exercise, Submission, File, Student
 from iliasCorrector import utils
@@ -10,21 +11,31 @@ import os
 @app.route('/')
 def index():
     exercises = Exercise.query.all()
-    return render_template('index.html', exercises=exercises)
+    return render_template('index.html', exercises=exercises, grading=True)
 
 
 @app.route('/exercise/<exercise_id>/')
 def exercise(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    submissions = exercise.submissions.join(Student).order_by(func.lower(Student.ident))
-    return render_template('exercise.html', exercise=exercise, submissions=submissions)
+    submissions = exercise.submissions.join(Student).order_by(
+            func.lower(Student.ident))
+    median = utils.submission_median(submissions)
+    mean = utils.submission_mean(submissions)
+    return render_template('exercise.html', exercise=exercise,
+                           submissions=submissions, grading=True,
+                           median=median, mean=mean)
 
 
 @app.route('/exercise/<exercise_id>/overview/')
 def exercise_overview(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    submissions = exercise.submissions.join(Student).order_by(func.lower(Student.ident))
-    return render_template('exercise_overview.html', exercise=exercise, submissions=submissions)
+    submissions = exercise.submissions.join(Student).order_by(
+            func.lower(Student.ident))
+    median = utils.submission_median(submissions)
+    mean = utils.submission_mean(submissions)
+    return render_template('exercise_overview.html', exercise=exercise,
+                           submissions=submissions, grading=True,
+                           median=median, mean=mean)
 
 
 def get_next_submission(exercise_id, ident=''):
@@ -34,28 +45,36 @@ def get_next_submission(exercise_id, ident=''):
 
 
 @app.route('/exercise/<exercise_id>/submission/')
-@app.route('/exercise/<exercise_id>/submission/<submission_id>/', methods=['GET', 'POST'])
+@app.route('/exercise/<exercise_id>/submission/<submission_id>/',
+           methods=['GET', 'POST'])
 def submission(exercise_id=None, submission_id=None):
     if not submission_id:
         submission = get_next_submission(exercise_id)
-        return redirect(url_for('submission', exercise_id=exercise_id, submission_id=submission.id))
+        return redirect(url_for('submission', exercise_id=exercise_id,
+                                submission_id=submission.id, grading=True))
     submission = Submission.query.get_or_404(submission_id)
     next_submission = get_next_submission(exercise_id,
                                           submission.student.ident)
     if request.method == 'POST':
         grade = request.form.get('grade', None)
         remarks = request.form.get('remarks', '')
-        flash('Successfully graded {} with {} points'.format(submission.student, grade), 'success')
+        flash('Successfully graded {} with {} points'.format(
+            submission.student, grade), 'success')
         submission.grade = grade
-        submission.remarks = remarks.strip().replace(';', '-').replace('\r\n', ' -- ')
+        submission.remarks = remarks.strip().replace(';', '-').replace(
+                '\r\n', ' -- ')
         db.session.add(submission)
         db.session.commit()
         if not next_submission:
-            flash('Finished correcting submissions for exercise {}'.format(submission.exercise), 'success')
-            return redirect(url_for('exercise', exercise_id=exercise_id))
-        return redirect(url_for('submission', exercise_id=exercise_id, submission_id=next_submission.id))
+            flash('Finished correcting submissions for exercise {}'.format(
+                submission.exercise), 'success')
+            return redirect(url_for('exercise', exercise_id=exercise_id,
+                                    grading=True))
+        return redirect(url_for('submission', exercise_id=exercise_id,
+                                submission_id=next_submission.id,
+                                grading=True))
     return render_template('submission.html', submission=submission,
-                           next_submission=next_submission)
+                           next_submission=next_submission, grading=True)
 
 
 @app.route('/files/<file_id>/')
@@ -69,9 +88,38 @@ def update_exercises():
     utils.update_exercises()
     return "done"
 
+
 @app.route('/exercise/<exercise_id>/export/')
 def export_grades(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
     response = make_response('\n'.join(utils.export_grades(exercise)))
     response.headers["Content-Disposition"] = "attachment; filename=points.csv"
     return response
+
+
+@app.route('/grades/')
+def grades():
+    exercises = utils.get_exercises()
+    return render_template('exercise_grades.html', exercises=exercises,
+                           presenting=True)
+
+
+@app.route('/grades/<exercise>/')
+def exercise_grades(exercise):
+    groups = utils.get_groups(exercise)
+    return render_template('groups.html', exercise=exercise, groups=groups,
+                           presenting=True)
+
+
+@app.route('/grades/<exercise>/<group>')
+def group(exercise, group):
+    students = utils.get_students(exercise, group)
+    headers = students[0]
+    headers.append('Sum')
+    students = students[1:]
+    for s in students:
+        first, last, _ = utils.split_ident(s[0])
+        s[0] = ', '.join([last, first])
+        s.append(sum([int(x) for x in s[1:]]))
+    return render_template('group.html', exercise=exercise, group=group,
+                           students=students, headers=headers, presenting=True)
