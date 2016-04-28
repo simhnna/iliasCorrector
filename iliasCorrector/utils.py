@@ -125,11 +125,15 @@ def get_students(exercise, group):
 
 def submission_median(submissions):
     grades = list(filter((None).__ne__, [s.grade for s in submissions]))
-    return statistics.median(grades)
+    if grades:
+        return statistics.median(grades)
+    return "Can't be determined yet"
 
 def submission_mean(submissions):
     grades = list(filter((None).__ne__, [s.grade for s in submissions]))
-    return statistics.mean(grades)
+    if grades:
+        return statistics.mean(grades)
+    return "Can't be determined yet"
 
 def split_ident(ident):
     data = ident.split('_')
