@@ -62,8 +62,8 @@
     {% for submission in submissions %}
     <tr>
       <td>{{ loop.index }}</td>
-      <td>{{ submission.student.last_name }}</td>
-      <td>{{ submission.student.first_name }}</td>
+      <td>{{ submission.last_name }}</td>
+      <td>{{ submission.first_name }}</td>
       <td>
         {% if submission.files.all()|length > 0 %}
         <i class="material-icons">done</i>

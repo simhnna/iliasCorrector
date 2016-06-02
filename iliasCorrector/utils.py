@@ -1,5 +1,5 @@
 from iliasCorrector import app, db
-from iliasCorrector.models import Student, Exercise, Submission, File
+from iliasCorrector.models import Exercise, Submission, File
 from flask import g
 from sqlalchemy import func
 
@@ -11,7 +11,6 @@ def import_grades(exercise, points):
     with open(points) as f:
         for line in f:
             data = line.split(';')
-            matr = int(data[0].split('_')[-1])
             grade = data[1]
             remarks = data[2]
             if grade == '---':
@@ -19,18 +18,10 @@ def import_grades(exercise, points):
             if remarks.strip() == '-- keine Bemerkung --':
                 remarks = None
 
-            submission = exercise.submissions.join(Student).filter(Student.matriculation_nr == matr).first()
+            submission = exercise.submissions.filter_by(student_ident=data[0]).first()
             if not submission:
-                student = Student.query.filter_by(matriculation_nr=matr).first()
-                if not student:
-                    student_data = data[0].split('_')
-                    last = student_data[0]
-                    first = ' '.join(student_data[1:-2])
-                    student = Student(first_name=first, last_name=last, ident=data[0], matriculation_nr = matr)
-                    db.session.add(student)
-                    db.session.commit()
                 submission = Submission(exercise_id=exercise.id,
-                        student_id=student.id, grade=0, remarks='-- keine Abgabe --')
+                        student_ident=data[0], grade=0, remarks='-- keine Abgabe --')
                 db.session.add(submission)
                 db.session.commit()
                 continue
@@ -44,7 +35,7 @@ def import_grades(exercise, points):
 
 def export_grades(exercise):
     lines = []
-    for submission in exercise.submissions.join(Student).order_by(func.lower(Student.ident)).all():
+    for submission in exercise.submissions.order_by(func.lower(Submission.student_ident)).all():
         grade = submission.grade
         if grade:
             grade = str(grade)
@@ -56,7 +47,7 @@ def export_grades(exercise):
             remarks.replace('\n', '  ')
         else:
             remarks = '-- keine Bemerkung --'
-        lines.append(';'.join([submission.student.ident, grade, remarks]))
+        lines.append(';'.join([submission.student_ident, grade, remarks]))
     return lines
 
 
@@ -81,17 +72,7 @@ def update_exercises():
         db.session.add(exercise)
         db.session.commit()
         for i in range(len(students)):
-            student_data = students[i].split('_')
-            matr = int(students[i].split('_')[-1])
-            last = student_data[0]
-            first = ' '.join(student_data[1:-2])
-
-            student = Student.query.filter_by(matriculation_nr=int(matr)).first()
-            if not student:
-                student = Student(first_name=first, last_name=last, matriculation_nr=int(matr), ident=students[i])
-                db.session.add(student)
-                db.session.commit()
-            submission = Submission(student=student, exercise=exercise)
+            submission = Submission(student_ident=students[i], exercise=exercise)
             db.session.add(submission)
             db.session.commit()
             for f in files[i + 1]:

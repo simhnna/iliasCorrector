@@ -1,7 +1,7 @@
 from flask import (render_template, flash, redirect, url_for, request,
                    send_from_directory, make_response)
 from iliasCorrector import app, db
-from iliasCorrector.models import Exercise, Submission, File, Student
+from iliasCorrector.models import Exercise, Submission, File
 from iliasCorrector import utils
 from werkzeug import secure_filename
 from sqlalchemy import func
@@ -17,8 +17,7 @@ def index():
 @app.route('/exercise/<exercise_id>/')
 def exercise(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    submissions = exercise.submissions.join(Student).order_by(
-            func.lower(Student.ident))
+    submissions = exercise.submissions.order_by(func.lower(Submission.student_ident))
     median = utils.submission_median(submissions)
     mean = utils.submission_mean(submissions)
     return render_template('exercise.html', exercise=exercise,
@@ -29,8 +28,7 @@ def exercise(exercise_id):
 @app.route('/exercise/<exercise_id>/overview/')
 def exercise_overview(exercise_id):
     exercise = Exercise.query.get_or_404(exercise_id)
-    submissions = exercise.submissions.join(Student).order_by(
-            func.lower(Student.ident))
+    submissions = exercise.submissions.order_by(func.lower(Submission.student_ident))
     median = utils.submission_median(submissions)
     mean = utils.submission_mean(submissions)
     return render_template('exercise_overview.html', exercise=exercise,
@@ -40,8 +38,8 @@ def exercise_overview(exercise_id):
 
 def get_next_submission(exercise_id, ident=''):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    return exercise.submissions.filter_by(grade=None).join(Student).order_by(
-            func.lower(Student.ident)).filter(Student.ident > ident).first()
+    return exercise.submissions.filter_by(grade=None).order_by(
+            func.lower(Submission.student_ident)).filter(Submission.student_ident > ident).first()
 
 
 @app.route('/exercise/<exercise_id>/submission/')
@@ -54,7 +52,7 @@ def submission(exercise_id=None, submission_id=None):
                                 submission_id=submission.id, grading=True))
     submission = Submission.query.get_or_404(submission_id)
     next_submission = get_next_submission(exercise_id,
-                                          submission.student.ident)
+                                          submission.student_ident)
     if request.method == 'POST':
         grade = request.form.get('grade', None)
         remarks = request.form.get('remarks', '')

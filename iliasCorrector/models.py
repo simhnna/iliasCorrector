@@ -1,5 +1,11 @@
 from iliasCorrector import db
 
+def _split_ident(ident):
+    data = ident.split('_')
+    matr = int(data[-1])
+    last = data[0]
+    first = ' '.join(data[1:-2])
+    return first, last, matr
 
 class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,31 +29,32 @@ class Exercise(db.Model):
         return '<Exercise {}>'.format(self.name)
 
 
-class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(80))
-    last_name = db.Column(db.String(80))
-    matriculation_nr = db.Column(db.Integer, unique=True)
-    ident = db.Column(db.String(256))
-    submissions = db.relationship('Submission', backref='student', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Student {}, {}>'.format(self.last_name, self.first_name)
-
-    def __str__(self):
-        return '{}, {}'.format(self.last_name, self.first_name)
-
-
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     grade = db.Column(db.Float)
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'))
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
+    student_ident = db.Column(db.String(256))
     files = db.relationship('File', backref='submission', lazy='dynamic')
     remarks = db.Column(db.Text)
 
     def __repr__(self):
-        return '<Submission of {} for exercise {}>'.format(self.student, self.exercise)
+        return '<Submission of {} for exercise {}>'.format(self.student_ident,
+                                                           self.exercise)
+    @property
+    def first_name(self):
+        return _split_ident(self.student_ident)[0]
+
+    @property
+    def last_name(self):
+        return _split_ident(self.student_ident)[1]
+
+    @property
+    def student(self):
+        return '{}, {}'.format(self.last_name, self.first_name)
+
+    @property
+    def matriculation_number(self):
+        return _split_ident(self.student_ident)[2]
 
 
 class File(db.Model):
