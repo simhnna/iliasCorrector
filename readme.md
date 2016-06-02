@@ -34,7 +34,7 @@ Note that each exercise (subdirectory) can only be imported one time. Currently 
 * Grades are imported from a csv file of the following format that resides in
   the assignments' directory:
 ```
-<Last Name>_<First Name>_<First Name><Last Name>_<Matriculation Number>;<Grade>|<Remarks>
+<Last Name>_<First Name>_<Student_Ident>;<Grade>|<Remarks>
 ```
 Here are a couple of sample entries:
 ```
