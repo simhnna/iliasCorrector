@@ -8,7 +8,7 @@ import statistics
 
 
 def import_grades(exercise, points):
-    if os.path.isfile(os.path.join(path, 'points.csv')):
+    if os.path.isfile(points):
         with open(points) as f:
             for line in f:
                 data = line.split(';')
