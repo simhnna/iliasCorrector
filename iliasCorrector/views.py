@@ -59,8 +59,8 @@ def submission(exercise_id=None, submission_id=None):
         flash('Successfully graded {} with {} points'.format(
             submission.student, grade), 'success')
         submission.grade = grade
-        submission.remarks = remarks.strip().replace(';', '-').replace(
-                '\r\n', ' -- ')
+        submission.remarks = remarks
+
         db.session.add(submission)
         db.session.commit()
         if not next_submission:

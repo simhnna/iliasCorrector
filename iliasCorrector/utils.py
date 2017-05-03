@@ -39,13 +39,12 @@ def export_grades(exercise):
     for submission in exercise.submissions.order_by(func.lower(Submission.student_ident)).all():
         grade = submission.grade
         if grade:
-            grade = str(grade)
+            grade = str(int(grade))
         else:
             grade = '---'
         remarks = submission.remarks
         if remarks:
-            remarks = remarks.strip()
-            remarks.replace('\n', '  ')
+            remarks = '"' + remarks.strip() + '"'
         else:
             remarks = '-- keine Bemerkung --'
         lines.append(';'.join([submission.student_ident, grade, remarks]))
