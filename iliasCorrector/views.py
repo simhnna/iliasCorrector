@@ -93,31 +93,3 @@ def export_grades(exercise_id):
     response = make_response('\n'.join(utils.export_grades(exercise)))
     response.headers["Content-Disposition"] = "attachment; filename=points.csv"
     return response
-
-
-@app.route('/grades/')
-def grades():
-    exercises = utils.get_exercises()
-    return render_template('exercise_grades.html', exercises=exercises,
-                           presenting=True)
-
-
-@app.route('/grades/<exercise>/')
-def exercise_grades(exercise):
-    groups = utils.get_groups(exercise)
-    return render_template('groups.html', exercise=exercise, groups=groups,
-                           presenting=True)
-
-
-@app.route('/grades/<exercise>/<group>')
-def group(exercise, group):
-    students = utils.get_students(exercise, group)
-    headers = students[0]
-    headers.append('Sum')
-    students = students[1:]
-    for s in students:
-        first, last, _ = utils.split_ident(s[0])
-        s[0] = ', '.join([last, first])
-        s.append(sum([int(x) for x in s[1:]]))
-    return render_template('group.html', exercise=exercise, group=group,
-                           students=students, headers=headers, presenting=True)

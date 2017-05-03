@@ -8,29 +8,30 @@ import statistics
 
 
 def import_grades(exercise, points):
-    with open(points) as f:
-        for line in f:
-            data = line.split(';')
-            grade = data[1]
-            remarks = data[2]
-            if grade == '---':
-                grade = None
-            if remarks.strip() == '-- keine Bemerkung --':
-                remarks = None
+    if os.path.isfile(os.path.join(path, 'points.csv')):
+        with open(points) as f:
+            for line in f:
+                data = line.split(';')
+                grade = data[1]
+                remarks = data[2]
+                if grade == '---':
+                    grade = None
+                if remarks.strip() == '-- keine Bemerkung --':
+                    remarks = None
 
-            submission = exercise.submissions.filter_by(student_ident=data[0]).first()
-            if not submission:
-                submission = Submission(exercise_id=exercise.id,
-                        student_ident=data[0], grade=0, remarks='-- keine Abgabe --')
-                db.session.add(submission)
-                db.session.commit()
-                continue
+                submission = exercise.submissions.filter_by(student_ident=data[0]).first()
+                if not submission:
+                    submission = Submission(exercise_id=exercise.id,
+                            student_ident=data[0], grade=0, remarks='-- keine Abgabe --')
+                    db.session.add(submission)
+                    db.session.commit()
+                    continue
 
-            if grade or remarks:
-                submission.remarks = remarks or submission.remarks
-                submission.grade = float(grade or '0') or submission.grade
-                db.session.add(submission)
-                db.session.commit()
+                if grade or remarks:
+                    submission.remarks = remarks or submission.remarks
+                    submission.grade = float(grade or '0') or submission.grade
+                    db.session.add(submission)
+                    db.session.commit()
 
 
 def export_grades(exercise):
@@ -82,26 +83,6 @@ def update_exercises():
 
         # import grades
         import_grades(exercise, os.path.join(path, 'points.csv'))
-
-
-def get_exercises():
-    return next(os.walk(os.path.join(app.config['BASE_DIR'], 'groups')))[1]
-
-
-def get_groups(exercise):
-    return next(os.walk(os.path.join(app.config['BASE_DIR'], 'groups', exercise)))[2]
-
-
-def get_students(exercise, group):
-    students = []
-    with open(os.path.join(app.config['BASE_DIR'], 'groups', exercise, group)) as f:
-        for line in f:
-            data = line.strip().split(';')
-            for i in range(len(data)):
-                if not data[i]:
-                    data[i] = 0
-            students.append(data)
-    return students
 
 
 def submission_median(submissions):
