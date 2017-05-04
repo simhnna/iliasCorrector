@@ -38,7 +38,7 @@ def export_grades(exercise):
     lines = []
     for submission in exercise.submissions.order_by(func.lower(Submission.student_ident)).all():
         grade = submission.grade
-        if grade:
+        if grade is not None:
             grade = str(int(grade))
         else:
             grade = '---'
