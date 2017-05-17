@@ -53,6 +53,10 @@ def submission(exercise_id=None, submission_id=None):
     submission = Submission.query.get_or_404(submission_id)
     next_submission = get_next_submission(exercise_id,
                                           submission.student_ident)
+    if submission.remarks:
+        rows = len(submission.remarks.split('\n'))
+    else:
+        rows = 2
     if request.method == 'POST':
         grade = request.form.get('grade', None)
         remarks = request.form.get('remarks', '')
@@ -72,7 +76,8 @@ def submission(exercise_id=None, submission_id=None):
                                 submission_id=next_submission.id,
                                 grading=True))
     return render_template('submission.html', submission=submission,
-                           next_submission=next_submission, grading=True)
+                           next_submission=next_submission, grading=True,
+                           rows=rows)
 
 
 @app.route('/files/<file_id>/')

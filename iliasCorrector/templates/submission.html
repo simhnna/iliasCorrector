@@ -54,7 +54,9 @@
         </div>
         <div class="input-field">
           <label for="remarks">Remarks</label>
-          <textarea class="materialize-textarea" id="remarks" type="text" name="remarks">{{ submission.remarks or '' }}</textarea>
+          <textarea class="materialize-textarea" id="remarks" type="text"
+                    rows="{{ rows }}" cols="50"
+                    name="remarks">{{ submission.remarks or '' }}</textarea>
         </div>
         <div class="form-group">
           <button class="btn btn-success btn-raised" type="submit">Submit</button>
