@@ -11,8 +11,7 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
 
 DEBUG = True
 SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-USERNAME = 'admin'
-PASSWORD = 'password'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 app = Flask(__name__)
