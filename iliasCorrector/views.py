@@ -11,7 +11,7 @@ import os
 @app.route('/')
 def index():
     exercises = Exercise.query.all()
-    return render_template('index.html', exercises=exercises, grading=True)
+    return render_template('index.html', exercises=exercises)
 
 
 @app.route('/exercise/<exercise_id>/')
@@ -21,8 +21,7 @@ def exercise(exercise_id):
     median = utils.submission_median(submissions)
     mean = utils.submission_mean(submissions)
     return render_template('exercise.html', exercise=exercise,
-                           submissions=submissions, grading=True,
-                           median=median, mean=mean)
+                           submissions=submissions, median=median, mean=mean)
 
 
 @app.route('/exercise/<exercise_id>/overview/')
@@ -32,8 +31,7 @@ def exercise_overview(exercise_id):
     median = utils.submission_median(submissions)
     mean = utils.submission_mean(submissions)
     return render_template('exercise_overview.html', exercise=exercise,
-                           submissions=submissions, grading=True,
-                           median=median, mean=mean)
+                           submissions=submissions, median=median, mean=mean)
 
 
 def get_next_submission(exercise_id, ident=''):
@@ -49,7 +47,7 @@ def submission(exercise_id=None, submission_id=None):
     if not submission_id:
         submission = get_next_submission(exercise_id)
         return redirect(url_for('submission', exercise_id=exercise_id,
-                                submission_id=submission.id, grading=True))
+                                submission_id=submission.id))
     submission = Submission.query.get_or_404(submission_id)
     next_submission = get_next_submission(exercise_id,
                                           submission.student_ident)
@@ -70,14 +68,11 @@ def submission(exercise_id=None, submission_id=None):
         if not next_submission:
             flash('Finished correcting submissions for exercise {}'.format(
                 submission.exercise), 'success')
-            return redirect(url_for('exercise', exercise_id=exercise_id,
-                                    grading=True))
+            return redirect(url_for('exercise', exercise_id=exercise_id))
         return redirect(url_for('submission', exercise_id=exercise_id,
-                                submission_id=next_submission.id,
-                                grading=True))
+                                submission_id=next_submission.id))
     return render_template('submission.html', submission=submission,
-                           next_submission=next_submission, grading=True,
-                           rows=rows)
+                           next_submission=next_submission, rows=rows)
 
 
 @app.route('/files/<file_id>/')
